@@ -1,0 +1,39 @@
+<template>
+    <lightning-card title="Device Evidence" icon-name="standard:video">
+        <div slot="actions">
+            <lightning-button-group>
+                <lightning-button label="Snapshot" onclick={loadSnapshot} disabled={busy}></lightning-button>
+                <template lwc:if={live}>
+                    <lightning-button label="Stop live view" onclick={stopLiveView}></lightning-button>
+                </template>
+                <template lwc:else>
+                    <lightning-button
+                        label="Live view"
+                        variant="brand"
+                        onclick={startLiveView}
+                        disabled={busy}
+                    ></lightning-button>
+                </template>
+            </lightning-button-group>
+        </div>
+
+        <div class="slds-var-p-horizontal_medium">
+            <template lwc:if={error}>
+                <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">{error}</div>
+            </template>
+            <template lwc:if={busy}>
+                <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+            </template>
+
+            <video class="media" autoplay muted playsinline hidden={hideVideo}></video>
+            <template lwc:if={showSnapshot}>
+                <img class="media" src={snapshotUrl} alt="Latest snapshot from the device" />
+            </template>
+            <template lwc:if={isEmpty}>
+                <p class="slds-text-color_weak">
+                    Load a snapshot or open the live view from the device that raised this work order.
+                </p>
+            </template>
+        </div>
+    </lightning-card>
+</template>

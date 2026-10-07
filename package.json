@@ -1,0 +1,15 @@
+{
+  "name": "firstresponse",
+  "private": true,
+  "description": "Device events to entitlement-checked Service Cloud work orders",
+  "license": "MIT",
+  "scripts": {
+    "prettier": "prettier --write \"force-app/**/*.{cls,trigger,js,html}\"",
+    "prettier:verify": "prettier --check \"force-app/**/*.{cls,trigger,js,html}\"",
+    "relay:test": "npm --prefix relay test"
+  },
+  "devDependencies": {
+    "prettier": "^3.9.9",
+    "prettier-plugin-apex": "^2.3.0"
+  }
+}

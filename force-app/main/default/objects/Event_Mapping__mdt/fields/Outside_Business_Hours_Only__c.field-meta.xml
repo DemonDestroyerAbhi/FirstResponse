@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Outside_Business_Hours_Only__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Only act when the event happens outside the org's default business hours (e.g. after-hours motion).</description>
+    <externalId>false</externalId>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <label>Outside Business Hours Only</label>
+    <type>Checkbox</type>
+</CustomField>

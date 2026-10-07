@@ -1,0 +1,16 @@
+{
+  "packageDirectories": [
+    {
+      "path": "force-app",
+      "default": true,
+      "package": "FirstResponse",
+      "versionName": "Ver 0.1",
+      "versionNumber": "0.1.0.NEXT",
+      "versionDescription": "Device events to entitlement-checked Service Cloud work orders"
+    }
+  ],
+  "name": "FirstResponse",
+  "namespace": "",
+  "sfdcLoginUrl": "https://login.salesforce.com",
+  "sourceApiVersion": "62.0"
+}

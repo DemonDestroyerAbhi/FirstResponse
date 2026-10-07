@@ -1,0 +1,9 @@
+{
+  "orgName": "FirstResponse",
+  "edition": "Developer",
+  "features": ["ServiceCloud", "Entitlements", "API", "AuthorApex"],
+  "settings": {
+    "lightningExperienceSettings": { "enableS1DesktopEnabled": true },
+    "entitlementSettings": { "enableEntitlements": true, "enableEntitlementVersioning": false }
+  }
+}

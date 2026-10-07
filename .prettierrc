@@ -1,0 +1,24 @@
+{
+  "printWidth": 120,
+  "tabWidth": 4,
+  "plugins": [
+    "prettier-plugin-apex"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "**/lwc/**/*.js",
+        "**/lwc/**/*.html"
+      ],
+      "options": {
+        "tabWidth": 4
+      }
+    },
+    {
+      "files": "**/lwc/**/*.html",
+      "options": {
+        "parser": "lwc"
+      }
+    }
+  ]
+}

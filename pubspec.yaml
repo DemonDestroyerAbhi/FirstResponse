@@ -7,4 +7,5 @@ environment:
 workspace:
   - apps/api
   - apps/app
+  - apps/site
   - packages/core_rules

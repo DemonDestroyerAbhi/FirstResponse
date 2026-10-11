@@ -281,4 +281,51 @@ void main() {
     expect(status, 404);
     expect(body['error'], 'Not found');
   });
+
+  group('CORS', () {
+    const site = 'https://site.example';
+    setUp(() {
+      handler = Api(
+        engine: api.engine,
+        bundle: bundle,
+        reviews: InMemoryReviewStore(),
+        adminToken: 'secret',
+        corsOrigins: {site},
+      ).handler;
+    });
+
+    Future<Response> send(String method, String path, String origin) async =>
+        handler(
+          Request(
+            method,
+            Uri.parse('http://localhost$path'),
+            headers: {'origin': origin},
+            body: method == 'POST' ? jsonEncode({'text': 'Error 300'}) : null,
+          ),
+        );
+
+    test('allows the listed origin on public routes', () async {
+      final pre = await send('OPTIONS', '/v1/diagnose', site);
+      expect(pre.statusCode, 204);
+      expect(pre.headers['access-control-allow-origin'], site);
+      final res = await send('POST', '/v1/diagnose', site);
+      expect(res.statusCode, 200);
+      expect(res.headers['access-control-allow-origin'], site);
+    });
+
+    test('never for other origins, admin or webhooks', () async {
+      for (final (origin, path) in [
+        ('https://evil.example', '/v1/diagnose'),
+        (site, '/v1/admin/review'),
+        (site, '/webhooks/whatsapp'),
+      ]) {
+        final res = await send('GET', path, origin);
+        expect(
+          res.headers['access-control-allow-origin'],
+          isNull,
+          reason: '$origin $path',
+        );
+      }
+    });
+  });
 }

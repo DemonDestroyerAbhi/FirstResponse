@@ -3,6 +3,8 @@
 //   PORT          Port to listen on (default 8080)
 //   RULES_DIR     Path to the repo's rules/ folder (default: found upwards)
 //   ADMIN_TOKEN   Bearer token for /v1/admin; admin routes are off without it
+//   CORS_ORIGINS  Comma-separated browser origins allowed on public routes,
+//                 e.g. https://example.in for the static site's diagnoser
 //   DATABASE_URL  postgresql://user:pass@host:5432/db?sslmode=require
 //                 Without it the review queue is in memory and lost on restart.
 //
@@ -45,6 +47,10 @@ Future<void> main() async {
     reviews: reviews,
     adminToken: env['ADMIN_TOKEN'],
     whatsapp: _whatsapp(env, engine, reviews),
+    corsOrigins: {
+      for (final o in (env['CORS_ORIGINS'] ?? '').split(','))
+        if (o.trim().isNotEmpty) o.trim(),
+    },
   );
 
   final handler = const Pipeline()

@@ -4,9 +4,10 @@ WORKDIR /src
 COPY pubspec.yaml pubspec.lock ./
 COPY packages/core_rules/pubspec.yaml packages/core_rules/
 COPY apps/api/pubspec.yaml apps/api/
-# The Flutter app is a workspace member but needs the Flutter SDK; the
-# server does not use it, so drop it from the workspace for this build.
-RUN sed -i '/  - apps\/app/d' pubspec.yaml && dart pub get
+# Only the server and its engine are copied in, so drop the other
+# workspace members (the Flutter app also needs the Flutter SDK).
+RUN sed -i -e '/  - apps\/app/d' -e '/  - apps\/site/d' pubspec.yaml \
+    && dart pub get
 COPY packages/core_rules packages/core_rules
 COPY apps/api apps/api
 COPY rules rules

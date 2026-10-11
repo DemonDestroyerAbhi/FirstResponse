@@ -14,6 +14,7 @@ Not affiliated with any government body.
 | `rules/records.json` | Records that can be wrong (Aadhaar, PAN, bank KYC…), which copies from which, and display labels. |
 | `rules/packs/<portal>/` | One rule pack per portal: `pack.json`, one JSON file per rule in `rules/`, golden cases in `golden/`. |
 | `apps/api` | Dart (Shelf) HTTP API: diagnose, confirm, rulebook downloads, life-certificate schedule, admin review queue. |
+| `apps/site` | Generates the public static site: one page per verified rule, a page per portal, sitemap and robots.txt. |
 | `apps/app` | Flutter app for Android, iOS and the logged-in web consoles. Diagnoses offline from a bundled copy of the rulebook. |
 
 ## Commands
@@ -102,6 +103,25 @@ Not done yet: images and voice notes (the bot asks for typed text),
 reminders (messages sent outside the 24-hour reply window need approved
 templates), and Hindi or Marathi replies.
 
+## Public site
+
+```sh
+cd apps/site
+dart run site:build --base-url https://example.in --api-url https://api.example.in
+dart run site:build --base-url https://example.in --drafts --out build/preview
+```
+
+Output is plain HTML, CSS and a small script, ready for any static host.
+Production builds publish **verified rules only**; a `--drafts` preview adds
+drafts, marks every page `noindex` and blocks crawlers. Each rule page lists
+the exact messages it covers (what people search for), the fix order, the
+steps, and its sources with the date they were checked. With `--api-url`,
+pages get a "check your message" box; add the site's origin to the API's
+`CORS_ORIGINS`.
+
+Page URLs come from rule ids (`jeevan_pramaan.ppo_mismatch` →
+`/jeevan-pramaan/ppo-mismatch/`), so keep ids stable once a rule is published.
+
 ## Writing a rule
 
 Add a JSON file under `rules/packs/<portal>/rules/` and at least one golden
@@ -126,7 +146,8 @@ The plan assumed a TypeScript monorepo (Expo + Next.js + Node). We chose:
 - **Dart everywhere.** One engine in `core_rules`, used by the Flutter app
   offline and, later, by a Dart API server. The engine is written once.
 - **Static site for SEO.** Flutter web renders to a canvas and indexes
-  poorly, so the public one-page-per-error-code site will be generated as
-  static HTML from the rule JSON. Flutter web serves the logged-in agent,
-  professional and admin consoles.
+  poorly, so the public one-page-per-error-code site is generated as static
+  HTML from the rule JSON, by a Dart generator that reuses the engine (not
+  Astro). Flutter web serves the logged-in agent, professional and admin
+  consoles.
 - **Browser extension (#4)** stays TypeScript; it only calls the API.

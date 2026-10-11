@@ -30,7 +30,7 @@ jobs:
       - run: flutter pub get
 
       - name: Format
-        run: dart format --output=none --set-exit-if-changed packages apps/api apps/app/lib apps/app/test
+        run: dart format --output=none --set-exit-if-changed packages apps/api apps/site apps/app/lib apps/app/test
 
       - name: Validate rulebook
         working-directory: packages/core_rules
@@ -50,6 +50,13 @@ jobs:
         run: |
           dart analyze --fatal-infos
           dart test
+
+      - name: Site tests and preview build
+        working-directory: apps/site
+        run: |
+          dart analyze --fatal-infos
+          dart test
+          dart run site:build --base-url https://example.invalid --drafts
 
       - name: Bundle rules into the app
         working-directory: packages/core_rules

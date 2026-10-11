@@ -1,0 +1,15 @@
+name: site
+description: Generates the public static site, one page per verified rule.
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.8.0
+
+dependencies:
+  core_rules:
+    path: ../../packages/core_rules
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.0

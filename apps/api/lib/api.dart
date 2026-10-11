@@ -38,12 +38,17 @@ class Api {
   /// Mounted at `/webhooks/whatsapp` when configured.
   final WhatsAppWebhook? whatsapp;
 
+  /// Browser origins (e.g. the static site) allowed to call the public
+  /// routes. Admin and webhook routes are never open to browsers.
+  final Set<String> corsOrigins;
+
   Api({
     required this.engine,
     required this.bundle,
     required this.reviews,
     this.adminToken,
     this.whatsapp,
+    this.corsOrigins = const {},
     DateTime Function()? clock,
   }) : clock = clock ?? DateTime.now;
 
@@ -74,8 +79,36 @@ class Api {
         const Pipeline().addMiddleware(_requireAdmin).addHandler(admin.call),
       );
 
-    return const Pipeline().addMiddleware(_errors).addHandler(router.call);
+    return const Pipeline()
+        .addMiddleware(_cors)
+        .addMiddleware(_errors)
+        .addHandler(router.call);
   }
+
+  static bool _isPublic(String path) =>
+      path.startsWith('v1/') && !path.startsWith('v1/admin');
+
+  Handler _cors(Handler inner) => (req) async {
+    final origin = req.headers['origin'];
+    if (origin == null ||
+        !corsOrigins.contains(origin) ||
+        !_isPublic(req.url.path)) {
+      return inner(req);
+    }
+    final headers = {'access-control-allow-origin': origin, 'vary': 'Origin'};
+    if (req.method == 'OPTIONS') {
+      return Response(
+        204,
+        headers: {
+          ...headers,
+          'access-control-allow-methods': 'GET, POST',
+          'access-control-allow-headers': 'content-type',
+          'access-control-max-age': '86400',
+        },
+      );
+    }
+    return (await inner(req)).change(headers: headers);
+  };
 
   static Response _disabled(Request _) => _error(404, 'Not configured');
 

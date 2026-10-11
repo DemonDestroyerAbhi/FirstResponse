@@ -110,6 +110,18 @@ class Engine {
     confirmedByUser: true,
   );
 
+  /// Records to fix and re-sync for [rule], in order. Limited to the
+  /// records its pack involves.
+  List<SequenceStep> sequenceFor(Rule rule) {
+    if (!rule.propagates) {
+      return [SequenceStep(rulebook.records[rule.record]!, StepKind.fix)];
+    }
+    final involves = rulebook.packOf(rule).involves;
+    return rulebook.sequencer.plan({
+      rule.record,
+    }, involved: involves.isEmpty ? null : involves);
+  }
+
   Diagnosis _build(
     String text,
     Match best,
@@ -124,15 +136,7 @@ class Engine {
       decision: decision,
       match: best,
       alternatives: rest,
-      sequence: switch (decision) {
-        Decision.review => const [],
-        _ when !best.rule.propagates => [
-          SequenceStep(rulebook.records[best.rule.record]!, StepKind.fix),
-        ],
-        _ => rulebook.sequencer.plan({
-          best.rule.record,
-        }, involved: pack.involves.isEmpty ? null : pack.involves),
-      },
+      sequence: decision == Decision.review ? const [] : sequenceFor(best.rule),
       freshness: best.rule.freshnessAt(now ?? DateTime.now()),
       packVersion: pack.version,
       confirmedByUser: confirmedByUser,

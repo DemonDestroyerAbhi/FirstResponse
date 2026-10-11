@@ -55,10 +55,36 @@ ADMIN_TOKEN=dev-only dart run bin/server.dart     # http://localhost:8080
 | `GET /v1/admin/review?status=open` | Review queue, oldest first (Bearer `ADMIN_TOKEN`) |
 | `POST /v1/admin/review/<id>/resolve` `{ruleId \| null, reviewer, note?}` | Map an input to a rule, or mark that a new rule is needed |
 | `GET /v1/admin/review/golden` | Resolved items as golden cases, ready to add to a pack |
+| `GET`/`POST /webhooks/whatsapp` | WhatsApp Cloud API webhook (see below) |
 
 Identity numbers (Aadhaar, PAN, account numbers) are masked inside the engine
 before anything is stored or returned, and request logs hold only method,
 path and status. The review queue is in memory until Postgres is added.
+
+## WhatsApp bot
+
+The bot lives in the API server (`apps/api/lib/src/whatsapp/`) and uses the
+same engine and review queue, so it never answers differently from the app.
+Users can type an error to get the fix, confirm fuzzy matches with Yes/No
+buttons, or tap *Life certificate* and send a date of birth.
+
+To connect it to the WhatsApp Cloud API:
+
+1. In the Meta app dashboard, set the webhook URL to
+   `https://<host>/webhooks/whatsapp`, pick a verify token, and subscribe to
+   the `messages` field.
+2. Start the server with `WHATSAPP_VERIFY_TOKEN`, `WHATSAPP_APP_SECRET`,
+   `WHATSAPP_ACCESS_TOKEN` and `WHATSAPP_PHONE_NUMBER_ID` set. With none set,
+   the webhook is off; with only some, the server refuses to start.
+
+Every webhook POST must carry a valid `X-Hub-Signature-256`. Replies are sent
+after the 200, and redelivered message ids are ignored. Conversation state
+(a pending question or date-of-birth prompt) is in memory and expires after
+30 minutes.
+
+Not done yet: images and voice notes (the bot asks for typed text),
+reminders (messages sent outside the 24-hour reply window need approved
+templates), and Hindi or Marathi replies.
 
 ## Writing a rule
 

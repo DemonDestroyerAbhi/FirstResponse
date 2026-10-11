@@ -10,8 +10,13 @@ import 'package:shelf_router/shelf_router.dart';
 
 import 'src/review_store.dart';
 import 'src/serialize.dart';
+import 'src/whatsapp/webhook.dart';
 
 export 'src/review_store.dart';
+export 'src/whatsapp/bot.dart';
+export 'src/whatsapp/messages.dart';
+export 'src/whatsapp/sessions.dart';
+export 'src/whatsapp/webhook.dart';
 
 /// Longest message we accept; real portal remarks are far shorter.
 const maxInputLength = 2000;
@@ -28,11 +33,15 @@ class Api {
 
   final DateTime Function() clock;
 
+  /// Mounted at `/webhooks/whatsapp` when configured.
+  final WhatsAppWebhook? whatsapp;
+
   Api({
     required this.engine,
     required this.bundle,
     required this.reviews,
     this.adminToken,
+    this.whatsapp,
     DateTime Function()? clock,
   }) : clock = clock ?? DateTime.now;
 
@@ -57,6 +66,7 @@ class Api {
       ..post('/v1/diagnose/confirm', _confirm)
       ..post('/v1/diagnose/reject', _reject)
       ..get('/v1/life-certificate', _lifeCertificate)
+      ..mount('/webhooks/whatsapp', whatsapp?.handler ?? _disabled)
       ..mount(
         '/v1/admin/',
         const Pipeline().addMiddleware(_requireAdmin).addHandler(admin.call),
@@ -64,6 +74,8 @@ class Api {
 
     return const Pipeline().addMiddleware(_errors).addHandler(router.call);
   }
+
+  static Response _disabled(Request _) => _error(404, 'Not configured');
 
   Response _health(Request _) =>
       _json({'ok': true, 'rulebookVersion': rulebookVersion});

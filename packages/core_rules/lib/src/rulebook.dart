@@ -33,6 +33,12 @@ class Rulebook {
 
   Iterable<Rule> get rules => packs.expand((p) => p.rules);
 
+  /// Every pack's id and version, e.g. `jeevan_pramaan@0.1.0`. Changes when
+  /// any pack changes, so it serves as the download version (ETag).
+  late final String version = [
+    for (final p in packs) '${p.info.id}@${p.info.version}',
+  ].join(',');
+
   Rule? rule(String id) {
     for (final r in rules) {
       if (r.id == id) return r;

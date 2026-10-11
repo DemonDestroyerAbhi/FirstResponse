@@ -56,9 +56,7 @@ class Api {
 
   /// Changes whenever any pack's version changes, so apps re-download only
   /// when there is something new.
-  late final String rulebookVersion = [
-    for (final p in _book.packs) '${p.info.id}@${p.info.version}',
-  ].join(',');
+  String get rulebookVersion => _book.version;
 
   Handler get handler {
     final admin = Router()

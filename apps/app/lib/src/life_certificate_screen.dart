@@ -2,18 +2,19 @@ import 'package:core_rules/core_rules.dart';
 import 'package:flutter/material.dart';
 
 import 'diagnose_screen.dart';
+import 'services/rulebook_service.dart';
 import 'widgets.dart';
 
 /// Module #9: when a pensioner must submit, and when to remind them.
 class LifeCertificateScreen extends StatefulWidget {
-  final Engine engine;
+  final RulebookService rules;
 
   /// Fixed in tests; the real clock otherwise.
   final DateTime Function() today;
 
   const LifeCertificateScreen({
     super.key,
-    required this.engine,
+    required this.rules,
     this.today = DateTime.now,
   });
 
@@ -68,7 +69,7 @@ class _LifeCertificateScreenState extends State<LifeCertificateScreen> {
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute<void>(
                 builder: (_) => DiagnoseScreen(
-                  engine: widget.engine,
+                  rules: widget.rules,
                   portal: 'jeevan_pramaan',
                 ),
               ),

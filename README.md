@@ -15,7 +15,7 @@ Not affiliated with any government body.
 | `rules/packs/<portal>/` | One rule pack per portal: `pack.json`, one JSON file per rule in `rules/`, golden cases in `golden/`. |
 | `apps/api` | Dart (Shelf) HTTP API: diagnose, confirm, rulebook downloads, life-certificate schedule, admin review queue. |
 | `apps/site` | Generates the public static site: one page per verified rule, a page per portal, sitemap and robots.txt. |
-| `apps/app` | Flutter app for Android, iOS and the logged-in web consoles. Diagnoses offline from a bundled copy of the rulebook. |
+| `apps/app` | Flutter app for Android, iOS and the logged-in web consoles. Diagnoses offline from a bundled copy of the rulebook and picks up newer rules from the API. |
 
 ## Commands
 
@@ -102,6 +102,26 @@ after the 200, and redelivered message ids are ignored. Conversation state
 Not done yet: images and voice notes (the bot asks for typed text),
 reminders (messages sent outside the 24-hour reply window need approved
 templates), and Hindi or Marathi replies.
+
+## App and the API
+
+```sh
+cd apps/app
+flutter run -d chrome --dart-define=API_URL=http://localhost:8080
+```
+
+Without `API_URL` the app runs fully offline. With it:
+
+- **Rule updates.** At launch the app uses its bundled rules (or a newer
+  download) and checks `/v1/rulebook` in the background, sending its version
+  as the ETag. A new bundle is validated before use and kept for the next
+  launch. Downloads are dropped when the app itself updates, so an old
+  download never overrides newer bundled rules.
+- **Unmatched messages** go to `/v1/diagnose`, already masked. If the server
+  matches one, the app's rules were stale: it refreshes and answers. If not,
+  the server queues it for review. Turning down every suggestion queues it
+  via `/v1/diagnose/reject`.
+- Life-certificate dates are computed on the phone from the same core code.
 
 ## Public site
 

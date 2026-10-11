@@ -1,28 +1,36 @@
-import 'dart:convert';
+import 'dart:async';
 
-import 'package:core_rules/core_rules.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'src/home_screen.dart';
+import 'src/services/api_client.dart';
+import 'src/services/rulebook_service.dart';
 
 /// Working name until the brand is decided.
 const appName = 'FirstResponse';
 
+/// Set with `--dart-define=API_URL=https://...`. Without it the app runs
+/// fully offline on its bundled rules.
+const apiUrl = String.fromEnvironment('API_URL');
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Rules ship inside the app so diagnosis works with no connection.
-  final bundle = jsonDecode(
-    await rootBundle.loadString('assets/rulebook.json'),
+  final rules = await RulebookService.load(
+    assetJson: await rootBundle.loadString('assets/rulebook.json'),
+    cache: PrefsBundleCache(),
+    api: apiUrl.isEmpty ? null : ApiClient(Uri.parse(apiUrl)),
   );
-  final engine = Engine(Rulebook.fromBundle(bundle as Map<String, dynamic>));
-  runApp(App(engine: engine));
+  runApp(App(rules: rules));
+  // Newer rules, if any, apply from the next diagnosis on.
+  unawaited(rules.refresh());
 }
 
 class App extends StatelessWidget {
-  final Engine engine;
+  final RulebookService rules;
 
-  const App({super.key, required this.engine});
+  const App({super.key, required this.rules});
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +44,7 @@ class App extends StatelessWidget {
       title: appName,
       theme: theme(Brightness.light),
       darkTheme: theme(Brightness.dark),
-      home: HomeScreen(engine: engine),
+      home: HomeScreen(rules: rules),
     );
   }
 }

@@ -1,28 +1,39 @@
 import 'package:core_rules/core_rules.dart';
 import 'package:flutter/material.dart';
 
+import 'services/rulebook_service.dart';
 import 'widgets.dart';
 
 /// Paste an error or rejection message; get the cause and the fix.
 class DiagnoseScreen extends StatefulWidget {
-  final Engine engine;
+  final RulebookService rules;
 
   /// Limits matching to one portal's rules, when the user came from a
   /// specific flow such as the life certificate.
   final String? portal;
 
-  const DiagnoseScreen({super.key, required this.engine, this.portal});
+  const DiagnoseScreen({super.key, required this.rules, this.portal});
 
   @override
   State<DiagnoseScreen> createState() => _DiagnoseScreenState();
 }
 
+/// Whether an unmatched message reached the review queue.
+enum _Queue { sending, sent, failed }
+
 class _DiagnoseScreenState extends State<DiagnoseScreen> {
   final _input = TextEditingController();
   Diagnosis? _result;
 
+  /// The engine that produced [_result]; confirming must use the same rules
+  /// even if newer ones arrive meanwhile.
+  late Engine _engine = widget.rules.engine;
+
   /// Index into the candidates being offered in a confirming question.
   int _asking = 0;
+
+  /// Null when nothing was sent (matched, or offline-only build).
+  _Queue? _queue;
 
   @override
   void dispose() {
@@ -30,25 +41,69 @@ class _DiagnoseScreenState extends State<DiagnoseScreen> {
     super.dispose();
   }
 
-  void _check() {
+  void _show(Engine engine, String text) {
+    _engine = engine;
+    _result = engine.diagnose(text, portal: widget.portal);
+    _asking = 0;
+    _queue = null;
+  }
+
+  Future<void> _check() async {
     final text = _input.text.trim();
     if (text.isEmpty) return;
     FocusScope.of(context).unfocus();
-    setState(() {
-      _result = widget.engine.diagnose(text, portal: widget.portal);
-      _asking = 0;
-    });
+    setState(() => _show(widget.rules.engine, text));
+    if (_result!.decision == Decision.review) await _escalate();
+  }
+
+  /// No local match: ask the server, which queues the message for review if
+  /// it cannot match it either. If it can, our rules are out of date.
+  Future<void> _escalate() async {
+    final api = widget.rules.api;
+    if (api == null) return;
+    // Already masked by the engine; the raw text never leaves the phone.
+    final masked = _result!.input;
+    setState(() => _queue = _Queue.sending);
+    try {
+      final decision = await api.diagnose(masked, portal: widget.portal);
+      if (decision != 'review' && await widget.rules.refresh()) {
+        if (mounted) setState(() => _show(widget.rules.engine, masked));
+        return;
+      }
+      _queued(decision == 'review');
+    } catch (_) {
+      _queued(false);
+    }
+  }
+
+  Future<void> _rejectedAll() async {
+    final api = widget.rules.api;
+    if (api == null) return;
+    setState(() => _queue = _Queue.sending);
+    try {
+      await api.reject(_result!.input, portal: widget.portal);
+      _queued(true);
+    } catch (_) {
+      _queued(false);
+    }
+  }
+
+  void _queued(bool ok) {
+    if (mounted) setState(() => _queue = ok ? _Queue.sent : _Queue.failed);
   }
 
   List<Match> get _candidates => [?_result?.match, ...?_result?.alternatives];
 
-  void _answer(bool yes) => setState(() {
-    if (yes) {
-      _result = widget.engine.confirm(_result!, _candidates[_asking]);
-    } else {
-      _asking++;
-    }
-  });
+  void _answer(bool yes) {
+    setState(() {
+      if (yes) {
+        _result = _engine.confirm(_result!, _candidates[_asking]);
+      } else {
+        _asking++;
+      }
+    });
+    if (!yes && _asking >= _candidates.length) _rejectedAll();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +139,7 @@ class _DiagnoseScreenState extends State<DiagnoseScreen> {
 
   List<Widget> _resultView(Diagnosis d) {
     if (d.decision == Decision.answer) {
-      return [DiagnosisView(diagnosis: d, rulebook: widget.engine.rulebook)];
+      return [DiagnosisView(diagnosis: d, rulebook: _engine.rulebook)];
     }
     if (d.decision == Decision.confirm && _asking < _candidates.length) {
       final candidate = _candidates[_asking].rule;
@@ -127,13 +182,19 @@ class _DiagnoseScreenState extends State<DiagnoseScreen> {
       ];
     }
     // No match, or the user turned down every candidate.
-    // TODO: send to the review queue once the API exists.
-    return const [
+    return [
       Notice(
         icon: Icons.manage_search,
-        text:
+        text: switch (_queue) {
+          _Queue.sending => 'Checking with our server…',
+          _Queue.sent =>
+            "We don't recognise this message yet, so we've sent it to our "
+                'team to add. Check that it is copied exactly, or ask at the '
+                'office that showed it.',
+          _ =>
             "We don't recognise this message yet. Check that it is copied "
-            'exactly, or ask at the office that showed it.',
+                'exactly, or ask at the office that showed it.',
+        },
       ),
     ];
   }

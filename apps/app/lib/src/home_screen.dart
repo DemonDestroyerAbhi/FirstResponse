@@ -1,15 +1,15 @@
-import 'package:core_rules/core_rules.dart';
 import 'package:flutter/material.dart';
 
 import '../main.dart';
 import 'diagnose_screen.dart';
 import 'life_certificate_screen.dart';
+import 'services/rulebook_service.dart';
 import 'widgets.dart';
 
 class HomeScreen extends StatelessWidget {
-  final Engine engine;
+  final RulebookService rules;
 
-  const HomeScreen({super.key, required this.engine});
+  const HomeScreen({super.key, required this.rules});
 
   @override
   Widget build(BuildContext context) {
@@ -30,13 +30,13 @@ class HomeScreen extends StatelessWidget {
             icon: Icons.event_available,
             title: 'Life certificate deadline',
             subtitle: 'When to submit for a pensioner, and reminders',
-            onTap: () => open(LifeCertificateScreen(engine: engine)),
+            onTap: () => open(LifeCertificateScreen(rules: rules)),
           ),
           _Choice(
             icon: Icons.help_outline,
             title: 'Explain a rejection or error',
             subtitle: 'Paste the message you got; we tell you what to fix',
-            onTap: () => open(DiagnoseScreen(engine: engine)),
+            onTap: () => open(DiagnoseScreen(rules: rules)),
           ),
           const SizedBox(height: 24),
           const Disclaimer(),

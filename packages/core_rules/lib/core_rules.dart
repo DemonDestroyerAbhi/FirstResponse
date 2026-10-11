@@ -6,5 +6,6 @@ export 'src/engine.dart';
 export 'src/life_certificate.dart';
 export 'src/matcher.dart';
 export 'src/model.dart';
+export 'src/privacy.dart';
 export 'src/rulebook.dart';
 export 'src/sequencer.dart';

@@ -47,4 +47,10 @@ void main() {
     expect(w.opens, DateTime.utc(2027, 4, 1));
     expect(w.closes, DateTime.utc(2027, 6, 30));
   });
+
+  test('after the deadline, the current window is next year', () {
+    final dob = DateTime.utc(1960, 5, 5);
+    expect(currentWindow(dob, DateTime.utc(2026, 11, 30)).closes.year, 2026);
+    expect(currentWindow(dob, DateTime.utc(2026, 12, 1)).closes.year, 2027);
+  });
 }

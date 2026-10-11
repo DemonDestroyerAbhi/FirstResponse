@@ -92,9 +92,7 @@ class _Season extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // After this year's deadline, plan for next year's season.
-    var window = windowFor(today.year, dob);
-    if (window.daysLeft(today) < 0) window = windowFor(today.year + 1, dob);
+    final window = currentWindow(dob, today);
     final left = window.daysLeft(today);
     final open = window.contains(today);
     final text = Theme.of(context).textTheme;

@@ -81,6 +81,19 @@ LifeCertificateWindow windowFor(
   );
 }
 
+/// The season a pensioner should act on: this year's, or next year's once
+/// this year's deadline has passed.
+LifeCertificateWindow currentWindow(
+  DateTime dateOfBirth,
+  DateTime today, {
+  LifeCertificatePolicy policy = LifeCertificatePolicy.centralGovernment,
+}) {
+  final window = windowFor(today.year, dateOfBirth, policy: policy);
+  return window.daysLeft(today) >= 0
+      ? window
+      : windowFor(today.year + 1, dateOfBirth, policy: policy);
+}
+
 /// Reminders still ahead of [today] for this season, in date order.
 List<Reminder> remindersFor(
   LifeCertificateWindow window,

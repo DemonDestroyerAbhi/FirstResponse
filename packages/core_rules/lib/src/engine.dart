@@ -1,5 +1,6 @@
 import 'matcher.dart';
 import 'model.dart';
+import 'privacy.dart';
 import 'rulebook.dart';
 import 'sequencer.dart';
 
@@ -56,12 +57,15 @@ class Engine {
 
   Engine(this.rulebook) : _matcher = RuleMatcher(rulebook.rules.toList());
 
+  /// [text] is masked before anything else, so [Diagnosis.input] never
+  /// holds an Aadhaar, PAN or account number.
   Diagnosis diagnose(
     String text, {
     String? portal,
     String? code,
     DateTime? now,
   }) {
+    text = maskIdentifiers(text);
     final matches = _matcher.match(text, portal: portal, code: code);
     if (matches.isEmpty) {
       return Diagnosis(input: text, decision: Decision.review);

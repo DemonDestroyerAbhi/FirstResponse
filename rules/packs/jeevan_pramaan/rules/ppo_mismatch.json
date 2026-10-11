@@ -1,0 +1,41 @@
+{
+  "id": "jeevan_pramaan.ppo_mismatch",
+  "version": "0.1.0",
+  "portal": "jeevan_pramaan",
+  "status": "draft",
+  "severity": "medium",
+  "title": "PPO number does not match",
+  "explain": "The PPO number entered does not match the one the disbursing agency holds.",
+  "match": {
+    "patterns": [
+      "ppo number mismatch",
+      "invalid ppo number",
+      "ppo not found"
+    ]
+  },
+  "rootCause": "pension_account.ppo_mismatch",
+  "blocks": [
+    "pension.payment"
+  ],
+  "fix": [
+    {
+      "actor": "self",
+      "action": "Check the PPO number on the PPO booklet or pension slip and submit again with exactly that number."
+    },
+    {
+      "actor": "bank_branch",
+      "action": "If the number is right, ask the branch to check the PPO number in its records.",
+      "bring": [
+        "ppo_booklet",
+        "passbook"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://jeevanpramaan.gov.in/",
+      "title": "Jeevan Pramaan portal",
+      "verifiedOn": null
+    }
+  ]
+}

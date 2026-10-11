@@ -1,0 +1,40 @@
+{
+  "id": "jeevan_pramaan.aadhaar_not_seeded_pension",
+  "version": "0.1.0",
+  "portal": "jeevan_pramaan",
+  "status": "draft",
+  "severity": "high",
+  "title": "Aadhaar is not linked to the pension account",
+  "explain": "The bank that pays the pension has not linked this Aadhaar to the pension account, so the digital certificate cannot be matched to the pensioner.",
+  "match": {
+    "patterns": [
+      "aadhaar not linked with pension account",
+      "aadhaar not seeded",
+      "aadhaar not linked to ppo"
+    ]
+  },
+  "rootCause": "pension_account.aadhaar_not_seeded",
+  "blocks": [
+    "pension.payment"
+  ],
+  "fix": [
+    {
+      "actor": "bank_branch",
+      "action": "Ask the branch that pays the pension to seed Aadhaar in the pension account, then submit the life certificate again.",
+      "form": "aadhaar_seeding_consent",
+      "bring": [
+        "aadhaar",
+        "passbook",
+        "ppo_booklet"
+      ],
+      "typicalDays": 7
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://jeevanpramaan.gov.in/",
+      "title": "Jeevan Pramaan portal",
+      "verifiedOn": null
+    }
+  ]
+}

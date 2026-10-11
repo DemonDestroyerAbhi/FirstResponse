@@ -1,0 +1,87 @@
+[
+  {
+    "input": "Error 300: Biometric data did not match",
+    "expect": {
+      "rule": "jeevan_pramaan.biometric_mismatch",
+      "decision": "answer"
+    }
+  },
+  {
+    "input": "Authentication failed",
+    "code": "330",
+    "expect": {
+      "rule": "jeevan_pramaan.biometrics_locked",
+      "decision": "answer"
+    }
+  },
+  {
+    "input": "Fingerprint not matched, please try again",
+    "expect": {
+      "rule": "jeevan_pramaan.biometric_mismatch",
+      "decision": "answer"
+    }
+  },
+  {
+    "input": "Biometrics locked",
+    "expect": {
+      "rule": "jeevan_pramaan.biometrics_locked",
+      "decision": "answer"
+    }
+  },
+  {
+    "input": "Face Authentication Failed!!",
+    "expect": {
+      "rule": "jeevan_pramaan.face_auth_failed",
+      "decision": "answer"
+    }
+  },
+  {
+    "input": "Status: Aadhaar not seeded with pension a/c",
+    "expect": {
+      "rule": "jeevan_pramaan.aadhaar_not_seeded_pension",
+      "decision": "answer"
+    }
+  },
+  {
+    "input": "Invalid PPO Number",
+    "expect": {
+      "rule": "jeevan_pramaan.ppo_mismatch",
+      "decision": "answer"
+    }
+  },
+  {
+    "input": "Life certificate rejected: name mismatch",
+    "expect": {
+      "rule": "jeevan_pramaan.name_mismatch",
+      "decision": "answer"
+    }
+  },
+  {
+    "input": "LC rejected by disbursing agency",
+    "expect": {
+      "rule": "jeevan_pramaan.rejected_by_agency",
+      "decision": "answer"
+    }
+  },
+  {
+    "input": "aadhar not linkd with pension acount",
+    "expect": {
+      "rule": "jeevan_pramaan.aadhaar_not_seeded_pension",
+      "decision": "confirm"
+    }
+  },
+  {
+    "input": "Pension of Rs 300 credited",
+    "expect": {
+      "rule": "jeevan_pramaan.biometric_mismatch",
+      "decision": "confirm"
+    }
+  },
+  {
+    "input": "Server busy, try after some time",
+    "expect": {
+      "rule": null,
+      "decision": "review"
+    }
+  }
+]

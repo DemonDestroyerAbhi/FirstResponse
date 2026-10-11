@@ -1,0 +1,52 @@
+{
+  "id": "jeevan_pramaan.face_auth_failed",
+  "version": "0.1.0",
+  "portal": "jeevan_pramaan",
+  "status": "draft",
+  "severity": "medium",
+  "title": "Face authentication failed",
+  "explain": "The face scan did not pass. Poor light, glasses or a moving camera often cause this.",
+  "match": {
+    "patterns": [
+      "face authentication failed",
+      "face not matched",
+      "liveness check failed"
+    ]
+  },
+  "rootCause": "aadhaar.biometric_mismatch",
+  "propagates": false,
+  "blocks": [
+    "pension.payment"
+  ],
+  "fix": [
+    {
+      "actor": "self",
+      "action": "Retry in good daylight, without glasses, holding the phone steady at eye level."
+    },
+    {
+      "actor": "self",
+      "action": "If it still fails, use fingerprint authentication at a bank branch or Common Service Centre."
+    },
+    {
+      "actor": "bank_branch",
+      "action": "If the deadline is close, submit a physical life certificate at the branch that pays the pension instead.",
+      "bring": [
+        "ppo_booklet",
+        "aadhaar",
+        "passbook"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://uidai.gov.in/",
+      "title": "UIDAI",
+      "verifiedOn": null
+    },
+    {
+      "url": "https://jeevanpramaan.gov.in/",
+      "title": "Jeevan Pramaan portal",
+      "verifiedOn": null
+    }
+  ]
+}

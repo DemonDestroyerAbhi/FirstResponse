@@ -1,0 +1,52 @@
+{
+  "id": "jeevan_pramaan.rejected_by_agency",
+  "version": "0.1.0",
+  "portal": "jeevan_pramaan",
+  "status": "draft",
+  "severity": "high",
+  "title": "Rejected by the pension disbursing agency",
+  "explain": "The certificate reached the bank or treasury that pays the pension, and they rejected it. The portal does not always show why.",
+  "match": {
+    "patterns": [
+      "rejected by disbursing agency",
+      "life certificate rejected",
+      "lc rejected"
+    ]
+  },
+  "rootCause": "pension_account.lc_rejected",
+  "blocks": [
+    "pension.payment"
+  ],
+  "fix": [
+    {
+      "actor": "bank_branch",
+      "action": "Ask the branch for the rejection reason in writing.",
+      "bring": [
+        "ppo_booklet",
+        "passbook"
+      ]
+    },
+    {
+      "actor": "bank_branch",
+      "action": "If the deadline is close, submit a physical life certificate at the branch that pays the pension instead.",
+      "bring": [
+        "ppo_booklet",
+        "aadhaar",
+        "passbook"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://jeevanpramaan.gov.in/",
+      "title": "Jeevan Pramaan portal",
+      "verifiedOn": null
+    },
+    {
+      "url": "https://doppw.gov.in/",
+      "title": "Department of Pension and Pensioners' Welfare",
+      "verifiedOn": null
+    }
+  ],
+  "generic": true
+}

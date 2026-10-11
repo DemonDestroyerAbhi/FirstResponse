@@ -1,0 +1,64 @@
+{
+  "records": [
+    {
+      "id": "aadhaar",
+      "name": "Aadhaar",
+      "fixedBy": "aadhaar_centre"
+    },
+    {
+      "id": "pan",
+      "name": "PAN",
+      "fixedBy": "pan_service_agency",
+      "copiesFrom": [
+        "aadhaar"
+      ]
+    },
+    {
+      "id": "bank_kyc",
+      "name": "Bank account KYC",
+      "fixedBy": "bank_branch",
+      "copiesFrom": [
+        "aadhaar",
+        "pan"
+      ]
+    },
+    {
+      "id": "npci_mapper",
+      "name": "NPCI Aadhaar payment mapper",
+      "fixedBy": "bank_branch",
+      "copiesFrom": [
+        "bank_kyc"
+      ]
+    },
+    {
+      "id": "pension_account",
+      "name": "Pension account (PPO record at the disbursing bank)",
+      "fixedBy": "pension_disbursing_bank",
+      "copiesFrom": [
+        "bank_kyc"
+      ]
+    },
+    {
+      "id": "epfo_kyc",
+      "name": "EPFO member KYC",
+      "fixedBy": "employer_and_epfo",
+      "copiesFrom": [
+        "aadhaar",
+        "pan",
+        "bank_kyc"
+      ]
+    }
+  ],
+  "labels": {
+    "self": "You",
+    "aadhaar_centre": "Aadhaar centre",
+    "bank_branch": "Bank branch that pays the pension",
+    "pan_service_agency": "PAN service agency",
+    "pension_disbursing_bank": "Pension disbursing bank",
+    "employer_and_epfo": "Employer and EPFO",
+    "aadhaar": "Aadhaar card",
+    "passbook": "Bank passbook",
+    "ppo_booklet": "PPO booklet or pension slip",
+    "aadhaar_seeding_consent": "Aadhaar seeding consent form"
+  }
+}

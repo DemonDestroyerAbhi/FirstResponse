@@ -1,0 +1,37 @@
+{
+  "id": "jeevan_pramaan.biometrics_locked",
+  "version": "0.1.0",
+  "portal": "jeevan_pramaan",
+  "status": "draft",
+  "severity": "medium",
+  "title": "Aadhaar biometrics are locked",
+  "explain": "The Aadhaar holder has locked their biometrics, so no fingerprint, iris or face check can succeed until they are unlocked.",
+  "match": {
+    "codes": [
+      "330"
+    ],
+    "patterns": [
+      "biometrics locked",
+      "biometric locked by aadhaar holder"
+    ]
+  },
+  "rootCause": "aadhaar.biometrics_locked",
+  "propagates": false,
+  "blocks": [
+    "pension.payment"
+  ],
+  "fix": [
+    {
+      "actor": "self",
+      "action": "Unlock biometrics on the myAadhaar website or the mAadhaar app using the OTP sent to the Aadhaar-registered mobile, then retry.",
+      "channel": "online"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://uidai.gov.in/",
+      "title": "UIDAI",
+      "verifiedOn": null
+    }
+  ]
+}

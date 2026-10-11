@@ -1,0 +1,60 @@
+{
+  "id": "jeevan_pramaan.biometric_mismatch",
+  "version": "0.1.0",
+  "portal": "jeevan_pramaan",
+  "status": "draft",
+  "severity": "high",
+  "title": "Fingerprint or iris did not match Aadhaar",
+  "explain": "The scan taken now did not match the biometrics stored with Aadhaar. This is common for older people whose fingerprints have worn down.",
+  "match": {
+    "codes": [
+      "300"
+    ],
+    "patterns": [
+      "biometric data did not match",
+      "biometric mismatch",
+      "fingerprint did not match",
+      "fingerprint not matched"
+    ]
+  },
+  "rootCause": "aadhaar.biometric_mismatch",
+  "propagates": false,
+  "blocks": [
+    "pension.payment"
+  ],
+  "fix": [
+    {
+      "actor": "self",
+      "action": "Try again with a different finger, or use iris or face authentication instead."
+    },
+    {
+      "actor": "aadhaar_centre",
+      "action": "If it keeps failing, update biometrics at an Aadhaar centre, then retry after the update is processed.",
+      "bring": [
+        "aadhaar"
+      ],
+      "typicalDays": 30
+    },
+    {
+      "actor": "bank_branch",
+      "action": "If the deadline is close, submit a physical life certificate at the branch that pays the pension instead.",
+      "bring": [
+        "ppo_booklet",
+        "aadhaar",
+        "passbook"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://uidai.gov.in/",
+      "title": "UIDAI",
+      "verifiedOn": null
+    },
+    {
+      "url": "https://jeevanpramaan.gov.in/",
+      "title": "Jeevan Pramaan portal",
+      "verifiedOn": null
+    }
+  ]
+}

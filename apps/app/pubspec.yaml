@@ -1,0 +1,25 @@
+name: app
+description: Mobile and web app. Diagnoses offline from the bundled rulebook.
+publish_to: none
+version: 0.1.0+1
+resolution: workspace
+
+environment:
+  sdk: ^3.8.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  core_rules:
+    path: ../../packages/core_rules
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    # Written by `dart run core_rules:rules bundle`; not checked in.
+    - assets/rulebook.json

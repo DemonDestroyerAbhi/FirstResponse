@@ -1,0 +1,42 @@
+{
+  "id": "jeevan_pramaan.name_mismatch",
+  "version": "0.1.0",
+  "portal": "jeevan_pramaan",
+  "status": "draft",
+  "severity": "medium",
+  "title": "Name does not match the pension record",
+  "explain": "The name in Aadhaar is spelled differently from the name in the pension account.",
+  "match": {
+    "patterns": [
+      "name mismatch",
+      "name does not match",
+      "name not matching with aadhaar"
+    ]
+  },
+  "rootCause": "pension_account.name_mismatch",
+  "blocks": [
+    "pension.payment"
+  ],
+  "fix": [
+    {
+      "actor": "bank_branch",
+      "action": "If the Aadhaar spelling is correct, ask the branch to update the name on the pension account.",
+      "bring": [
+        "aadhaar",
+        "ppo_booklet",
+        "passbook"
+      ]
+    },
+    {
+      "actor": "aadhaar_centre",
+      "action": "If Aadhaar itself is wrong, correct Aadhaar first, then update the pension account."
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://jeevanpramaan.gov.in/",
+      "title": "Jeevan Pramaan portal",
+      "verifiedOn": null
+    }
+  ]
+}

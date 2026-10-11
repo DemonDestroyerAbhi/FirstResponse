@@ -1,0 +1,11 @@
+name: core_rules
+description: Deterministic rules engine, matcher and fix sequencer shared by the app, API and tools.
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.8.0
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.0

@@ -1,0 +1,9 @@
+name: firstresponse_workspace
+publish_to: none
+
+environment:
+  sdk: ^3.8.0
+
+workspace:
+  - apps/app
+  - packages/core_rules

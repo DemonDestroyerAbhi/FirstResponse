@@ -1,0 +1,11 @@
+{
+  "id": "jeevan_pramaan",
+  "version": "0.1.0",
+  "portal": "jeevan_pramaan",
+  "name": "Jeevan Pramaan (digital life certificate)",
+  "involves": [
+    "aadhaar",
+    "bank_kyc",
+    "pension_account"
+  ]
+}

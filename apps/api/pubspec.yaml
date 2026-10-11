@@ -11,6 +11,7 @@ dependencies:
     path: ../../packages/core_rules
   crypto: ^3.0.6
   http: ^1.2.2
+  postgres: ^3.4.0
   shelf: ^1.4.0
   shelf_router: ^1.1.4
 

@@ -3,6 +3,8 @@
 //   PORT          Port to listen on (default 8080)
 //   RULES_DIR     Path to the repo's rules/ folder (default: found upwards)
 //   ADMIN_TOKEN   Bearer token for /v1/admin; admin routes are off without it
+//   DATABASE_URL  postgresql://user:pass@host:5432/db?sslmode=require
+//                 Without it the review queue is in memory and lost on restart.
 //
 // WhatsApp, all four or none (the webhook is off without them):
 //   WHATSAPP_VERIFY_TOKEN      Our token, entered in the Meta dashboard
@@ -15,6 +17,7 @@ import 'dart:io';
 import 'package:api/api.dart';
 import 'package:core_rules/core_rules.dart';
 import 'package:core_rules/io.dart';
+import 'package:postgres/postgres.dart' as pg;
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 
@@ -25,7 +28,17 @@ Future<void> main() async {
       : findRulesDir();
   final bundle = readBundle(rulesDir);
   final engine = Engine(Rulebook.fromBundle(bundle));
-  final reviews = InMemoryReviewStore();
+  final databaseUrl = env['DATABASE_URL'];
+  final pool = databaseUrl == null ? null : pg.Pool<void>.withUrl(databaseUrl);
+  final ReviewStore reviews;
+  if (pool != null) {
+    final version = await migrate(pool);
+    stdout.writeln('Database at schema $version');
+    reviews = PostgresReviewStore(pool);
+  } else {
+    stderr.writeln('DATABASE_URL not set: review queue is in memory only');
+    reviews = InMemoryReviewStore();
+  }
   final api = Api(
     engine: engine,
     bundle: bundle,
@@ -44,6 +57,18 @@ Future<void> main() async {
     '${api.adminToken == null ? ', admin disabled' : ''}'
     '${api.whatsapp == null ? ', WhatsApp disabled' : ''}',
   );
+
+  // Stop taking requests, finish replies already started, then disconnect.
+  Future<void> shutdown(ProcessSignal signal) async {
+    stdout.writeln('Shutting down on $signal');
+    await server.close();
+    await api.whatsapp?.idle();
+    await pool?.close();
+    exit(0);
+  }
+
+  ProcessSignal.sigint.watch().first.then(shutdown);
+  if (!Platform.isWindows) ProcessSignal.sigterm.watch().first.then(shutdown);
 }
 
 /// Logs method, path, status and time only. Query strings (a date of birth)

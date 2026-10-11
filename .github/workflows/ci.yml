@@ -8,6 +8,16 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: firstresponse
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready --health-interval 5s
+          --health-timeout 5s --health-retries 10
     steps:
       - uses: actions/checkout@v4
 
@@ -35,6 +45,8 @@ jobs:
 
       - name: API tests
         working-directory: apps/api
+        env:
+          TEST_DATABASE_URL: postgresql://postgres:ci@localhost:5432/firstresponse?sslmode=disable
         run: |
           dart analyze --fatal-infos
           dart test

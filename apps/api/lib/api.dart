@@ -12,6 +12,8 @@ import 'src/review_store.dart';
 import 'src/serialize.dart';
 import 'src/whatsapp/webhook.dart';
 
+export 'src/db/migrations.dart';
+export 'src/db/postgres_review_store.dart';
 export 'src/review_store.dart';
 export 'src/whatsapp/bot.dart';
 export 'src/whatsapp/messages.dart';

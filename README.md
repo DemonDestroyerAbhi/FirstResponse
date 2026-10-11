@@ -43,6 +43,22 @@ cd apps/api
 ADMIN_TOKEN=dev-only dart run bin/server.dart     # http://localhost:8080
 ```
 
+The review queue is stored in Postgres when `DATABASE_URL` is set, and in
+memory (lost on restart) when it is not. The server applies schema
+migrations at startup; several instances can start at once safely.
+
+```sh
+docker run -d --name fr-pg -e POSTGRES_PASSWORD=dev -e POSTGRES_DB=firstresponse \
+  -p 5432:5432 postgres:16-alpine
+export DATABASE_URL='postgresql://postgres:dev@localhost:5432/firstresponse?sslmode=disable'
+TEST_DATABASE_URL=$DATABASE_URL dart test      # also runs the Postgres tests
+```
+
+To deploy, build the image from the repo root
+(`docker build -f apps/api/Dockerfile -t api .`). It holds the compiled
+server and the rules, runs as a non-root user, and stops cleanly on
+SIGTERM. Use `sslmode=require` or stricter for a managed database.
+
 ## API
 
 | Route | Does |
@@ -59,7 +75,7 @@ ADMIN_TOKEN=dev-only dart run bin/server.dart     # http://localhost:8080
 
 Identity numbers (Aadhaar, PAN, account numbers) are masked inside the engine
 before anything is stored or returned, and request logs hold only method,
-path and status. The review queue is in memory until Postgres is added.
+path and status.
 
 ## WhatsApp bot
 
@@ -80,7 +96,7 @@ To connect it to the WhatsApp Cloud API:
 Every webhook POST must carry a valid `X-Hub-Signature-256`. Replies are sent
 after the 200, and redelivered message ids are ignored. Conversation state
 (a pending question or date-of-birth prompt) is in memory and expires after
-30 minutes.
+30 minutes, so run one API instance until it moves to a shared store.
 
 Not done yet: images and voice notes (the bot asks for typed text),
 reminders (messages sent outside the 24-hour reply window need approved
